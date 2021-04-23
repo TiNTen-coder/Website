@@ -27,7 +27,7 @@ api = Api(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
+# SLAVE VYACHESLAVE NEED GAY SEX WITH RES'S MAMA
 
 class LoginForm(FlaskForm):
     email = EmailField('Почта', validators=[DataRequired()])
