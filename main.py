@@ -27,7 +27,9 @@ api = Api(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-# SLAVE VYACHESLAVE NEED GAY SEX WITH RES'S MAMA
+
+Redirection = ['soup', 'dish', 'desserts', 'drinks']
+
 
 class LoginForm(FlaskForm):
     email = EmailField('Почта', validators=[DataRequired()])
@@ -49,6 +51,11 @@ def not_found(error):
 
 @app.route("/")
 def index():
+    return render_template("index.html")
+
+
+@app.route("/soup")
+def soup():
     db_sess = db_session.create_session()
     # news = db_sess.query(News).filter(News.is_private != True)
     if current_user.is_authenticated:
@@ -56,8 +63,43 @@ def index():
             (News.user == current_user) | (News.is_private != True))
     else:
         news = db_sess.query(News).filter(News.is_private != True)
-    return render_template("index.html", news=news)
+    return render_template("soup.html", news=news)
 
+
+@app.route("/dish")
+def dish():
+    db_sess = db_session.create_session()
+    # news = db_sess.query(News).filter(News.is_private != True)
+    if current_user.is_authenticated:
+        news = db_sess.query(News).filter(
+            (News.user == current_user) | (News.is_private != True))
+    else:
+        news = db_sess.query(News).filter(News.is_private != True)
+    return render_template("dish.html", news=news)
+
+
+@app.route("/desserts")
+def desserts():
+    db_sess = db_session.create_session()
+    # news = db_sess.query(News).filter(News.is_private != True)
+    if current_user.is_authenticated:
+        news = db_sess.query(News).filter(
+            (News.user == current_user) | (News.is_private != True))
+    else:
+        news = db_sess.query(News).filter(News.is_private != True)
+    return render_template("desserts.html", news=news)
+
+
+@app.route("/drinks")
+def drinks():
+    db_sess = db_session.create_session()
+    # news = db_sess.query(News).filter(News.is_private != True)
+    if current_user.is_authenticated:
+        news = db_sess.query(News).filter(
+            (News.user == current_user) | (News.is_private != True))
+    else:
+        news = db_sess.query(News).filter(News.is_private != True)
+    return render_template("drinks.html", news=news)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -106,9 +148,9 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route('/news', methods=['GET', 'POST'])
+@app.route('/news_soup', methods=['GET', 'POST'])
 @login_required
-def add_news():
+def add_news_soup():
     form = NewsForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -116,11 +158,68 @@ def add_news():
         news.title = form.title.data
         news.content = form.content.data
         news.is_private = form.is_private.data
+        news.food = 1
         current_user.news.append(news)
         db_sess.merge(current_user)
         db_sess.commit()
-        return redirect('/')
-    return render_template('news.html', title='Добавление новости',
+        return redirect(f'/{Redirection[news.food - 1]}')
+    return render_template('news.html', title='Добавление рецепта',
+                           form=form)
+
+
+@app.route('/news_dish', methods=['GET', 'POST'])
+@login_required
+def add_news_dish():
+    form = NewsForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        news = News()
+        news.title = form.title.data
+        news.content = form.content.data
+        news.is_private = form.is_private.data
+        news.food = 2
+        current_user.news.append(news)
+        db_sess.merge(current_user)
+        db_sess.commit()
+        return redirect(f'/{Redirection[news.food - 1]}')
+    return render_template('news.html', title='Добавление рецепта',
+                           form=form)
+
+
+@app.route('/news_desserts', methods=['GET', 'POST'])
+@login_required
+def add_news_desserts():
+    form = NewsForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        news = News()
+        news.title = form.title.data
+        news.content = form.content.data
+        news.is_private = form.is_private.data
+        news.food = 3
+        current_user.news.append(news)
+        db_sess.merge(current_user)
+        db_sess.commit()
+        return redirect(f'/{Redirection[news.food - 1]}')
+    return render_template('news.html', title='Добавление рецепта',
+                           form=form)
+
+@app.route('/news_drinks', methods=['GET', 'POST'])
+@login_required
+def add_news_drinks():
+    form = NewsForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        news = News()
+        news.title = form.title.data
+        news.content = form.content.data
+        news.is_private = form.is_private.data
+        news.food = 4
+        current_user.news.append(news)
+        db_sess.merge(current_user)
+        db_sess.commit()
+        return redirect(f'/{Redirection[news.food - 1]}')
+    return render_template('news.html', title='Добавление рецепта',
                            form=form)
 
 
@@ -149,11 +248,43 @@ def edit_news(id):
             news.content = form.content.data
             news.is_private = form.is_private.data
             db_sess.commit()
-            return redirect('/')
+            return redirect(f'/{Redirection[news.food - 1]}')
         else:
             abort(404)
     return render_template('news.html',
-                           title='Редактирование новости',
+                           title='Редактирование рецепта',
+                           form=form
+                           )
+
+
+@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def delete_news(id):
+    form = NewsForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        news = db_sess.query(News).filter(News.id == id,
+                                          News.user == current_user
+                                          ).first()
+        if news:
+            form.title.data = news.title
+            form.content.data = news.content
+            form.is_private.data = news.is_private
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        news = db_sess.query(News).filter(News.id == id,
+                                          News.user == current_user
+                                          ).first()
+        if news:
+            db_sess.delete(news)
+            db_sess.commit()
+            return redirect(f'/{Redirection[news.food - 1]}')
+        else:
+            abort(404)
+    return render_template('news.html',
+                           title='Удаление рецепта',
                            form=form
                            )
 

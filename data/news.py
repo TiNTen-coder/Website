@@ -19,7 +19,8 @@ class News(SqlAlchemyBase, SerializerMixin):
 
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
+    food = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     user = orm.relation('User')
 
     def __repr__(self):
-        return f"<User> {self.user_id}  <New> {self.id} {self.title} {self.created_date} {self.is_private} {self.content}"
+        return f"<User> {self.user_id}  <New> {self.id} {self.title} {self.created_date} {self.is_private} {self.content} {self.food}"
